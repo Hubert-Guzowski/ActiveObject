@@ -12,6 +12,8 @@ public class Consumer extends Thread {
         this.proxy = proxy;
         this.max_portion = max_portion;
         this.random = new Random();
+
+
     }
 
     private void printResult(Object result){
