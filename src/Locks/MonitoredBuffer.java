@@ -31,31 +31,23 @@ public class MonitoredBuffer {
         this.operationWeight = operationWeight;
     }
 
-    public void produce(int portion){
+    public void produce(int portion) throws InterruptedException {
         myLock.lock();
         try {
             while(((ReentrantLock)(myLock)).hasWaiters(first_producent)) {
-                try {
                     producents.await();
-                }catch (InterruptedException e){
-                    e.printStackTrace();
-                }
             }
             while(buffer_size - queue.size() < portion){
-                try {
+
                     first_producent.await();
-                }catch (InterruptedException e){
-                    e.printStackTrace();
-                }
+
             }
             for(int i=0; i<portion; i++) queue.add(generator.nextInt());
 
             //sztuczna praca
-            try {
+
                 sleep(operationWeight);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
 
             producents.signal();
             first_consument.signal();
@@ -65,31 +57,19 @@ public class MonitoredBuffer {
         }
     }
 
-    public void consume(int portion){
+    public void consume(int portion) throws InterruptedException {
         myLock.lock();
         try {
             while(((ReentrantLock)(myLock)).hasWaiters(first_consument)) {
-                try {
-                    consuments.await();
-                }catch (InterruptedException e){
-                    e.printStackTrace();
-                }
+                consuments.await();
             }
             while(queue.size() < portion) {
-                try {
-                    first_consument.await();
-                }catch (InterruptedException e){
-                    e.printStackTrace();
-                }
+                first_consument.await();
             }
             for(int i=0; i<portion; i++) queue.poll();
 
             //sztuczna praca
-            try {
-                sleep(operationWeight);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            sleep(operationWeight);
 
             consuments.signal();
             first_producent.signal();

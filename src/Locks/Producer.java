@@ -31,23 +31,26 @@ public class Producer extends Thread {
     }
 
     private boolean canRun(){
-        if(runFlag) return System.nanoTime() - this.timeStamp < timeLimit;
+        if(runFlag) return System.currentTimeMillis() - this.timeStamp < timeLimit;
         else return this.amount < this.amountLimit;
+    }
+
+    public long getAmount(){
+        return this.amount;
     }
 
     @Override
     public void run() {
-        this.timeStamp = System.nanoTime();
+        this.timeStamp = System.currentTimeMillis();
 
-        while(canRun()){
-            int portion = abs(random.nextInt()) % max_portion + 1;
-            monitoredBuffer.produce(portion);
-            this.amount += portion;
-
+        while(canRun()) {
             try {
+                int portion = abs(random.nextInt()) % max_portion + 1;
+                monitoredBuffer.produce(portion);
+                this.amount += portion;
                 sleep(workTime);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (InterruptedException e){
+                return;
             }
 
         }
