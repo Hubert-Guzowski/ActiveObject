@@ -10,18 +10,19 @@ public class Producer extends Thread{
     private boolean runFlag;
     private Long timestamp;
     private Long duration;
+    private long worktime;
     private int amount;
 
 
-    public Producer(Proxy proxy, int max_portion, boolean runFlag, long seed, Long timestamp, Long duration){
-        this(proxy, max_portion, runFlag, seed, timestamp, duration, 0);
+    public Producer(Proxy proxy, int max_portion, boolean runFlag, long seed, Long timestamp, Long duration, long worktime){
+        this(proxy, max_portion, runFlag, seed, timestamp, duration, 0, worktime);
     }
 
-    public Producer(Proxy proxy, int max_portion, boolean runFlag, long seed, Long timestamp, int amount){
-        this(proxy, max_portion, runFlag, seed, timestamp, 0L, amount);
+    public Producer(Proxy proxy, int max_portion, boolean runFlag, long seed, Long timestamp, int amount, long worktime){
+        this(proxy, max_portion, runFlag, seed, timestamp, 0L, amount, worktime);
     }
 
-    private Producer(Proxy proxy, int max_portion, boolean runFlag, long seed, Long timestamp, Long duration, int amount){
+    private Producer(Proxy proxy, int max_portion, boolean runFlag, long seed, Long timestamp, Long duration, int amount, long worktime){
         this.proxy = proxy;
         this.max_portion = max_portion;
         this.random = new Random(seed);
@@ -29,6 +30,7 @@ public class Producer extends Thread{
         this.timestamp = timestamp;
         this.duration = duration;
         this.amount = amount;
+        this.worktime = worktime;
     }
 
     private void printResult(Object result){
@@ -49,6 +51,13 @@ public class Producer extends Thread{
                 e.printStackTrace();
             }
 
+            try {
+                sleep(worktime);
+            }
+            catch (InterruptedException e){
+                e.printStackTrace();
+            }
+
             while(!future.isAvailable()){
                 try {
                     sleep(10);
@@ -58,7 +67,6 @@ public class Producer extends Thread{
                 }
             }
             amount += 1;
-            System.out.println("Produced");
         }
 
         return amount;
@@ -76,6 +84,13 @@ public class Producer extends Thread{
                 e.printStackTrace();
             }
 
+            try {
+                sleep(worktime);
+            }
+            catch (InterruptedException e){
+                e.printStackTrace();
+            }
+
             while(!future.isAvailable()){
                 try {
                     sleep(10);
@@ -85,7 +100,6 @@ public class Producer extends Thread{
                 }
             }
             currentlyProduced += 1;
-            System.out.println("Produced");
         }
 
         return System.nanoTime() - timestamp;
@@ -93,7 +107,6 @@ public class Producer extends Thread{
 
     @Override
     public void run() {
-        System.out.println("p");
 
         if(runFlag){
             System.out.println(timeLimitedRun());

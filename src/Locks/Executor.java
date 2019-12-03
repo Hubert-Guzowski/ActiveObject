@@ -3,7 +3,7 @@ package Locks;
 import java.io.FileNotFoundException;
 import java.util.Random;
 
-public class Main {
+public class Executor {
 
     public static void timeLimitedLocks(String fileName,
                                         int producerNumber,
@@ -82,7 +82,7 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            amountLimitedLocks("./example.txt", 100, 100, 1000, 500, 500, 0, 0, 0, 10000000);
+            amountLimitedLocks("./example.txt", 100, 100, 1000, 500, 500, 0, 0, 0, 100000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

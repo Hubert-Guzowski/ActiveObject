@@ -1,3 +1,6 @@
+import Locks.Executor;
+import Locks.Executor.*;
+
 public class Main {
 
     private static void programExecution(){
@@ -16,11 +19,15 @@ public class Main {
 
 
         int Consumers_number = 5;
+        int max_portion_consumers = 50;
         long consumersSeed = 123512532L;
+        long worktimeConsumers = 10L;
 
 
         int Producers_number = 5;
+        int max_portion_producers = 50;
         long producersSeed = 8376259234L;
+        long worktimeProducers = 10L;
 
         Buffer buffer = new Buffer(buffer_size, operationWeight);
         RequestQueue requestQueue = new RequestQueue();
@@ -28,31 +35,44 @@ public class Main {
 
         Scheduler scheduler = new Scheduler(requestQueue);
         scheduler.start();
+
+        System.out.println("Starting active object threads\n");
         
-//        Consumer[] Consumers = new Consumer[Consumers_number];
         for (int i = 0; i < Consumers_number; i++) {
             if(ifTimeLimitedRun){
-                new Consumer(proxy, buffer_size/2, ifTimeLimitedRun, consumersSeed, System.nanoTime(), duration).start();
-//                Consumers[i] = new Consumer(proxy, buffer_size/2, ifTimeLimitedRun, consumersSeed, System.nanoTime(), duration);
+                new Consumer(proxy, max_portion_consumers, ifTimeLimitedRun, consumersSeed, System.nanoTime(), duration, worktimeConsumers).start();
             }else{
-                new Consumer(proxy, buffer_size/2, ifTimeLimitedRun, consumersSeed, System.nanoTime(), amount).start();
-//                Consumers[i] = new Consumer(proxy, buffer_size/2, ifTimeLimitedRun, consumersSeed, System.nanoTime(), amount);
+                new Consumer(proxy, max_portion_consumers, ifTimeLimitedRun, consumersSeed, System.nanoTime(), amount, worktimeConsumers).start();
             }
 
         }
 
-//        Producer[] Producers = new Producer[Producers_number];
         for (int i = 0; i < Producers_number; i++) {
             if(ifTimeLimitedRun){
-                new Producer(proxy, buffer_size/2, ifTimeLimitedRun, producersSeed, System.nanoTime(), duration).start();
-//                Producer[i] = new Consumer(proxy, buffer_size/2, ifTimeLimitedRun, producersSeed, System.nanoTime(), duration);
+                new Producer(proxy, max_portion_producers, ifTimeLimitedRun, producersSeed, System.nanoTime(), duration, worktimeProducers).start();
             }else{
-                new Producer(proxy, buffer_size/2, ifTimeLimitedRun, producersSeed, System.nanoTime(), amount).start();
-//                Producer[i] = new Consumer(proxy, buffer_size/2, ifTimeLimitedRun, producersSeed, System.nanoTime(), amount);
+                new Producer(proxy, max_portion_producers, ifTimeLimitedRun, producersSeed, System.nanoTime(), amount, worktimeProducers).start();
             }
         }
 
-//        for (int i = 0; i < Consumers_number; i++) Consumers[i].start();
-//        for (int i = 0; i < Producers_number; i++) Producers[i].start();
+        System.out.println("Starting locks threads\n");
+
+        if(ifTimeLimitedRun){
+            try {
+                Executor.timeLimitedLocks("./example.txt", Producers_number, Consumers_number, buffer_size,
+                        max_portion_producers, max_portion_consumers, operationWeight, worktimeProducers, worktimeConsumers);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }else{
+            try {
+                Executor.amountLimitedLocks("./example.txt", Producers_number, Consumers_number, buffer_size,
+                        max_portion_producers, max_portion_consumers, operationWeight, worktimeProducers, worktimeConsumers, amount);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+
     }
 }
