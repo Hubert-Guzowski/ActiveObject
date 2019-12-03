@@ -5,9 +5,11 @@ public class Buffer {
 
     private Queue<Integer> buffer;
     private int size;
+    private Long operationWeight;
 
-    public Buffer(int size) {
+    public Buffer(int size, Long operationWeight) {
         this.buffer = new LinkedList<>();
+        this.operationWeight = operationWeight;
         this.size = size;
     }
 
@@ -16,10 +18,18 @@ public class Buffer {
     }
 
     public int freeSpace(){
+
+        Long start = System.nanoTime();
+        while (System.nanoTime() - start < operationWeight){}
+
         return size - buffer.size();
     }
 
     public void add(int element){
+
+        Long start = System.nanoTime();
+        while (System.nanoTime() - start < operationWeight){}
+
         this.buffer.add(element);
     }
 

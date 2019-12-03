@@ -9,23 +9,25 @@ public class Producer extends Thread{
     private Random random;
     private boolean runFlag;
     private Long timestamp;
+    private Long duration;
     private int amount;
 
 
-    public Producer(Proxy proxy, int max_portion, boolean runFlag, long seed, Long timestamp){
-        this(proxy, max_portion, runFlag, seed, timestamp, 0);
+    public Producer(Proxy proxy, int max_portion, boolean runFlag, long seed, Long timestamp, Long duration){
+        this(proxy, max_portion, runFlag, seed, timestamp, duration, 0);
     }
 
-    public Producer(Proxy proxy, int max_portion, boolean runFlag, long seed, int amount){
-        this(proxy, max_portion, runFlag, seed, 0L, amount);
+    public Producer(Proxy proxy, int max_portion, boolean runFlag, long seed, Long timestamp, int amount){
+        this(proxy, max_portion, runFlag, seed, timestamp, 0L, amount);
     }
 
-    private Producer(Proxy proxy, int max_portion, boolean runFlag, long seed, Long timestamp, int amount){
+    private Producer(Proxy proxy, int max_portion, boolean runFlag, long seed, Long timestamp, Long duration, int amount){
         this.proxy = proxy;
         this.max_portion = max_portion;
         this.random = new Random(seed);
         this.runFlag = runFlag;
         this.timestamp = timestamp;
+        this.duration = duration;
         this.amount = amount;
     }
 
@@ -36,18 +38,10 @@ public class Producer extends Thread{
         System.out.println("\b ]");
     }
 
-    private void timeLimitedRun(){
+    private int timeLimitedRun(){
+        amount = 0;
 
-    }
-
-    private void amountLimitedTime(){
-
-    }
-
-    @Override
-    public void run() {
-        System.out.println("p");
-        while(true){
+        while(System.nanoTime() - timestamp < duration){
             try {
                 future = proxy.produce(random.nextInt() % max_portion + 1);
             }
@@ -63,8 +57,48 @@ public class Producer extends Thread{
                     e.printStackTrace();
                 }
             }
+            amount += 1;
             System.out.println("Produced");
-//            printResult(future.getData());
+        }
+
+        return amount;
+
+    }
+
+    private Long amountLimitedRun(){
+        int currentlyProduced = 0;
+
+        while(currentlyProduced < amount){
+            try {
+                future = proxy.produce(random.nextInt() % max_portion + 1);
+            }
+            catch (InterruptedException e){
+                e.printStackTrace();
+            }
+
+            while(!future.isAvailable()){
+                try {
+                    sleep(10);
+                }
+                catch (InterruptedException e){
+                    e.printStackTrace();
+                }
+            }
+            currentlyProduced += 1;
+            System.out.println("Produced");
+        }
+
+        return System.nanoTime() - timestamp;
+    }
+
+    @Override
+    public void run() {
+        System.out.println("p");
+
+        if(runFlag){
+            System.out.println(timeLimitedRun());
+        }else{
+            System.out.println(amountLimitedRun());
         }
     }
 }
