@@ -43,7 +43,7 @@ public class Consumer extends Thread {
     private int timeLimitedRun(){
         amount = 0;
 
-        while(System.nanoTime() - timestamp < duration){
+        while(System.currentTimeMillis() - timestamp < duration){
             try {
                 future = proxy.consume(random.nextInt() % max_portion + 1);
             }
@@ -101,7 +101,7 @@ public class Consumer extends Thread {
             currentlyConsumed += 1;
         }
 
-        return System.nanoTime() - timestamp;
+        return System.currentTimeMillis() - timestamp;
     }
 
     @Override

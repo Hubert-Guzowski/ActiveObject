@@ -13,7 +13,7 @@ public class Main {
         Long operationWeight = 10000000L;
 
 
-        boolean ifTimeLimitedRun = false;
+        boolean ifTimeLimitedRun = true;
         Long duration = 20000000000L;
         int amount = 20;
 
@@ -40,18 +40,18 @@ public class Main {
         
         for (int i = 0; i < Consumers_number; i++) {
             if(ifTimeLimitedRun){
-                new Consumer(proxy, max_portion_consumers, ifTimeLimitedRun, consumersSeed, System.nanoTime(), duration, worktimeConsumers).start();
+                new Consumer(proxy, max_portion_consumers, ifTimeLimitedRun, consumersSeed, System.currentTimeMillis(), duration, worktimeConsumers).start();
             }else{
-                new Consumer(proxy, max_portion_consumers, ifTimeLimitedRun, consumersSeed, System.nanoTime(), amount, worktimeConsumers).start();
+                new Consumer(proxy, max_portion_consumers, ifTimeLimitedRun, consumersSeed, System.currentTimeMillis(), amount, worktimeConsumers).start();
             }
 
         }
 
         for (int i = 0; i < Producers_number; i++) {
             if(ifTimeLimitedRun){
-                new Producer(proxy, max_portion_producers, ifTimeLimitedRun, producersSeed, System.nanoTime(), duration, worktimeProducers).start();
+                new Producer(proxy, max_portion_producers, ifTimeLimitedRun, producersSeed, System.currentTimeMillis(), duration, worktimeProducers).start();
             }else{
-                new Producer(proxy, max_portion_producers, ifTimeLimitedRun, producersSeed, System.nanoTime(), amount, worktimeProducers).start();
+                new Producer(proxy, max_portion_producers, ifTimeLimitedRun, producersSeed, System.currentTimeMillis(), amount, worktimeProducers).start();
             }
         }
 
@@ -60,7 +60,7 @@ public class Main {
         if(ifTimeLimitedRun){
             try {
                 Executor.timeLimitedLocks("./example.txt", Producers_number, Consumers_number, buffer_size,
-                        max_portion_producers, max_portion_consumers, operationWeight, worktimeProducers, worktimeConsumers);
+                        max_portion_producers, max_portion_consumers, operationWeight, worktimeProducers, worktimeConsumers, duration);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

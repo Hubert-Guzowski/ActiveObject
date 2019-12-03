@@ -13,7 +13,8 @@ public class Executor {
                                         int maxPortionConsumer,
                                         long bufferWork,
                                         long producerWork,
-                                        long consumerWork) throws InterruptedException {
+                                        long consumerWork,
+                                        long timeLimit) throws InterruptedException {
 
 
         Consumer[] consumers = new Consumer[consumerNumber];
@@ -21,8 +22,8 @@ public class Executor {
         MonitoredBuffer monitoredBuffer = new MonitoredBuffer(bufferSize, bufferWork);
         int seed = (new Random()).nextInt();
 
-        for(int i=0; i<consumerNumber; i++) consumers[i] = new Consumer(monitoredBuffer, seed, maxPortionConsumer, consumerWork, true, 30000, 0);
-        for(int i=0; i<producerNumber; i++) producers[i] = new Producer(monitoredBuffer, seed, maxPortionProducer, producerWork, true, 30000, 0);
+        for(int i=0; i<consumerNumber; i++) consumers[i] = new Consumer(monitoredBuffer, seed, maxPortionConsumer, consumerWork, true, timeLimit, 0);
+        for(int i=0; i<producerNumber; i++) producers[i] = new Producer(monitoredBuffer, seed, maxPortionProducer, producerWork, true, timeLimit, 0);
 
         long timestamp = System.currentTimeMillis();
         for(Consumer consumer : consumers) consumer.start();
@@ -31,7 +32,7 @@ public class Executor {
         long productions = 0;
         long consumtions = 0;
 
-        while(System.currentTimeMillis() - timestamp < 3000) {};
+        while(System.currentTimeMillis() - timestamp < timeLimit) {}
         for(Consumer consumer : consumers) consumer.interrupt();
         for(Producer producer : producers) producer.interrupt();
 
@@ -82,7 +83,8 @@ public class Executor {
 
     public static void main(String[] args) {
         try {
-            amountLimitedLocks("./example.txt", 100, 100, 1000, 500, 500, 0, 0, 0, 100000);
+            timeLimitedLocks("./example.txt", 100, 100, 1000, 500, 500, 0, 0, 0, 100000);
+//            amountLimitedLocks("./example.txt", 100, 100, 1000, 500, 500, 0, 0, 0, 100000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

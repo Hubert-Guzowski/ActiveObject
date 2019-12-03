@@ -19,16 +19,16 @@ public class Buffer {
 
     public int freeSpace(){
 
-        Long start = System.nanoTime();
-        while (System.nanoTime() - start < operationWeight){}
+        Long start = System.currentTimeMillis();
+        while (System.currentTimeMillis() - start < operationWeight){}
 
         return size - buffer.size();
     }
 
     public void add(int element){
 
-        Long start = System.nanoTime();
-        while (System.nanoTime() - start < operationWeight){}
+        Long start = System.currentTimeMillis();
+        while (System.currentTimeMillis() - start < operationWeight){}
 
         this.buffer.add(element);
     }
