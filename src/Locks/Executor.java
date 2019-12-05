@@ -11,6 +11,8 @@ public class Executor {
                                         int bufferSize,
                                         int maxPortionProducer,
                                         int maxPortionConsumer,
+                                        long producersSeed,
+                                        long consumersSeed,
                                         long bufferWork,
                                         long producerWork,
                                         long consumerWork,
@@ -20,10 +22,9 @@ public class Executor {
         Consumer[] consumers = new Consumer[consumerNumber];
         Producer[] producers = new Producer[producerNumber];
         MonitoredBuffer monitoredBuffer = new MonitoredBuffer(bufferSize, bufferWork);
-        int seed = (new Random()).nextInt();
 
-        for(int i=0; i<consumerNumber; i++) consumers[i] = new Consumer(monitoredBuffer, seed, maxPortionConsumer, consumerWork, true, timeLimit, 0);
-        for(int i=0; i<producerNumber; i++) producers[i] = new Producer(monitoredBuffer, seed, maxPortionProducer, producerWork, true, timeLimit, 0);
+        for(int i=0; i<consumerNumber; i++) consumers[i] = new Consumer(monitoredBuffer, consumersSeed, maxPortionConsumer, consumerWork, true, timeLimit, 0);
+        for(int i=0; i<producerNumber; i++) producers[i] = new Producer(monitoredBuffer, producersSeed, maxPortionProducer, producerWork, true, timeLimit, 0);
 
         long timestamp = System.currentTimeMillis();
         for(Consumer consumer : consumers) consumer.start();
@@ -56,6 +57,8 @@ public class Executor {
                                         int bufferSize,
                                         int maxPortionProducer,
                                         int maxPortionConsumer,
+                                        long producersSeed,
+                                        long consumersSeed,
                                         long bufferWork,
                                         long producerWork,
                                         long consumerWork,
@@ -65,10 +68,9 @@ public class Executor {
         Consumer[] consumers = new Consumer[consumerNumber];
         Producer[] producers = new Producer[producerNumber];
         MonitoredBuffer monitoredBuffer = new MonitoredBuffer(bufferSize, bufferWork);
-        int seed = (new Random()).nextInt();
 
-        for(int i=0; i<consumerNumber; i++) consumers[i] = new Consumer(monitoredBuffer, seed, maxPortionConsumer, consumerWork, false, 0, amountLimit);
-        for(int i=0; i<producerNumber; i++) producers[i] = new Producer(monitoredBuffer, seed, maxPortionProducer, producerWork, false, 0, amountLimit);
+        for(int i=0; i<consumerNumber; i++) consumers[i] = new Consumer(monitoredBuffer, consumersSeed, maxPortionConsumer, consumerWork, false, 0, amountLimit);
+        for(int i=0; i<producerNumber; i++) producers[i] = new Producer(monitoredBuffer, producersSeed, maxPortionProducer, producerWork, false, 0, amountLimit);
 
         long timestamp = System.currentTimeMillis();
         for(Consumer consumer : consumers) consumer.start();
@@ -81,12 +83,4 @@ public class Executor {
 
     }
 
-    public static void main(String[] args) {
-        try {
-            timeLimitedLocks("./example.txt", 100, 100, 1000, 500, 500, 0, 0, 0, 100000);
-//            amountLimitedLocks("./example.txt", 100, 100, 1000, 500, 500, 0, 0, 0, 100000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }

@@ -42,11 +42,10 @@ public class MonitoredBuffer {
                     first_producent.await();
 
             }
-            for(int i=0; i<portion; i++) queue.add(generator.nextInt());
-
-            //sztuczna praca
-
+            for(int i=0; i<portion; i++) {
                 sleep(operationWeight);
+                queue.add(generator.nextInt());
+            }
 
 
             producents.signal();
@@ -66,10 +65,11 @@ public class MonitoredBuffer {
             while(queue.size() < portion) {
                 first_consument.await();
             }
-            for(int i=0; i<portion; i++) queue.poll();
+            for(int i=0; i<portion; i++){
+                sleep(operationWeight);
+                queue.poll();
+            }
 
-            //sztuczna praca
-            sleep(operationWeight);
 
             consuments.signal();
             first_producent.signal();
